@@ -1,0 +1,10 @@
+get-aduser -filter {msRTCSIP-PrimaryUserAddress -like “*”}|set-aduser -clear msRTCSIP-PrimaryUserAddress,msRTCSIP-PrimaryHomeServer,msRTCSIP-UserEnabled,msRTCSIP-OptionFlags,msRTCSIP-UserPolicies, msRTCSIP-DeploymentLocator, msRTCSIP-FederationEnabled, msRTCSIP-InternetAccessEnabled
+
+
+-----
+
+$userlist = Get-CSOnlineUser
+foreach($User in $userlist)
+{
+Grant-CsTeamsUpgradePolicy -PolicyName UpgradeToTeams -Identity $User.SipAddress
+}

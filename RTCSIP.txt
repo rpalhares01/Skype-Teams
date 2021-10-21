@@ -1,0 +1,20 @@
+#This script is for RTCSIP attributes removel 
+# Import CSV into variable $userscsv
+$users = Import-Csv -Path C:\Scripts\adtest.csv
+
+ForEach ($user in (import-csv -path "C:\Scripts\adtest.csv"))
+{
+  Get-AdUser -Identity $user.samaccountname | Set-ADUser -clear msRTCSIP-PrimaryUserAddress,msRTCSIP-PrimaryHomeServer, msRTCSIP-UserEnabled,msRTCSIP-OptionFlags,msRTCSIP-UserPolicies, msRTCSIP-DeploymentLocator, msRTCSIP-FederationEnabled, msRTCSIP-InternetAccessEnabled
+}
+
+Script to upgrade Users from S4B Island to Teams (Por CSV)
+import-csv users.csv | foreach{ Grant-CsTeamsUpgradePolicy -Identity $_.upn -PolicyName UpgradeToTeams }
+
+#Tenant Level
+Grant-CsTeamsUpgradePolicy -PolicyName UpgradeToTeams -Global
+#If the first one don't result
+$userlist = Get-CSOnlineUser
+foreach($User in $userlist
+{
+ Grant-CsTeamsUpgradePolicy -PolicyName UpgradeToTeams -Identity $User.SipAddress
+}
