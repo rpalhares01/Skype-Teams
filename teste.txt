@@ -8,3 +8,40 @@ foreach($User in $userlist)
 {
 Grant-CsTeamsUpgradePolicy -PolicyName UpgradeToTeams -Identity $User.SipAddress
 }
+
+----
+Param(
+    [Parameter(Mandatory=$false,
+    ValueFromPipeline=$true)]
+    [String[]]
+    $csvPath
+)
+if ($null -eq $csvPath)
+{
+    Write-Host "Enter path to CSV file (Header should be UPN):" -ForegroundColor Cyan
+    $csvPath =Read-Host
+}
+$script:Users =Import-CSV -Path $csvPath
+Write-Host $($Users).count" users were loaded.." -ForegroundColor Yellow
+{
+    Write-Host "Checking user: "$u.UPN
+    
+    $tMode =Get-CsOnlineUser -identity $u.UPN |Select-Object TeamsUpgradeEffectiveMode
+ 
+    $teamsMode =$tMode.TeamsUpgradeEffectiveMode
+ 
+    if ($null -eq $teamsMode)
+    {
+        $teamsMode ="none"
+    }
+ 
+    
+    [PSCustomObject]@{
+        ID =$u.UPN
+        TeamsMode =$teamsMode
+    }
+}
+ 
+$data |Export-CSV -path $env:USERPROFILE\Desktop\usersTeamsMode.csv -NoTypeInformation
+ 
+Write-Host "Script finished, you will find CSV report on your desktop - usersTeamsMode.csv" -ForegroundColor Green
